@@ -87,14 +87,14 @@ sd_grass <- SharedData$new(wb_grass)
 ============
 
 
-Column {data-width=230}
+Column {data-width=180}
 ----------------------------------
 
 ### Quick filter
 
 
 ```{r}
-filter_slider("year", "Select years", sd, ~year)
+#filter_slider("year", "Select years", sd, ~year)
 filter_select("host", "Select host", sd, ~host)
 filter_select("PstI_specie", "Pyricularia spp.", sd, ~PstI_specie)
 ```
@@ -123,6 +123,10 @@ pal <- colorFactor("RdYlGn", domain = c("Wheat", "Non-wheat"))
 
 leaflet(data = sd) %>%
 
+  
+   setView(-47.96101,-19.72314, zoom = 4) %>% 
+
+  
   addProviderTiles(providers$CartoDB.Voyager) %>% 
   
   addCircleMarkers(group = "wheat", 
@@ -177,6 +181,9 @@ icons <- awesomeIcons(
 
 leaflet(data = sd_grass) %>%
 
+  
+   setView(-47.96101,-19.72314, zoom = 4) %>% 
+  
   addProviderTiles(providers$CartoDB.Voyager) %>% 
   
   addCircleMarkers(group = "host2", 
