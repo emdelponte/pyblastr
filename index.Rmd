@@ -76,7 +76,9 @@ library(crosstalk)
 library(leaflet)
 library(leaflet.extras)
 library(DT)
-sd <- SharedData$new(wb_all)
+row.names(wb_all) <- NULL
+wb_all <- as.data.frame(wb_all)
+sd <- SharedData$new(wb_all, key = ~code)
 sd_grass <- SharedData$new(wb_grass)
 ```
 
@@ -129,9 +131,18 @@ library(RColorBrewer)
 library(htmltools)
 pal <- colorFactor("Set2", domain = c("Wheat", "Non-wheat"))
 
-leaflet(data = sd) %>%
+leaflet(data = sd, width = '100%') %>%
   setView(-47.96101, -19.72314, zoom = 5) %>%
-  addProviderTiles(providers$CartoDB.Voyager) %>%
+  addProviderTiles("Esri.WorldImagery", group = 'Aerial') %>%
+  addProviderTiles("OpenStreetMap.Mapnik", group = 'Street') %>%
+  addProviderTiles("OpenTopoMap", group = 'Terrain') %>%
+  addScaleBar('bottomright') %>%
+  addProviderTiles(providers$CartoDB.Voyager, group = 'Default') %>%
+  addLayersControl(
+        baseGroups = c("Default", "Aerial", "Street", "Terrain"),
+        overlayGroups = 'wheat',
+        options = layersControlOptions(collapsed = TRUE)
+      ) %>% 
   addCircleMarkers(
     group = "wheat",
     radius = 6,
@@ -140,16 +151,17 @@ leaflet(data = sd) %>%
     label = paste(wb_all$host, "- Details"),
     fillColor = ~ pal(wheat),
     popup = paste(
-      "Code:<b>", wb_all$"code", "</b>", "<br>",
-      "Field sample:<b>", wb_all$"sample", "</b>", "<br><i>",
-      "Host:<b>", wb_all$"host", "</b></i>", "<br>",
-      "Tissue:<b>", wb_all$"tissue", "</b>", "<br>",
-      "Field sample:<b>", wb_all$"sample", "</b>", "<br>",
-      "City:<b>", wb_all$"city", "</b>", "<br>",
-      "Year:<b>", wb_all$"year", "</b>", "<br>",
-      "DNA extraction:<b>", wb_all$"DNA_extraction", "</b>", "<br>",
-      "Species:<b><i>", wb_all$"PstI_specie", "</b>", "<br></i>",
-      "OBS:<b>", wb_all$"observation", "</b>", "<br>"
+      '<h3>Isolate details</h3>',
+      "Code:", wb_all$"code", "<br>",
+      "Field sample:", wb_all$"sample","<br><i>",
+      "Host:", wb_all$"host", "</i>", "<br>",
+      "Tissue:", wb_all$"tissue",  "<br>",
+      "Field sample:", wb_all$"sample",  "<br>",
+      "City:", wb_all$"city", "<br>",
+      "Year:", wb_all$"year",  "<br>",
+      "DNA extraction:", wb_all$"DNA_extraction",  "<br>",
+      "Species:<i>", wb_all$"PstI_specie",  "<br></i>",
+      "OBS:", wb_all$"observation", "", "<br>"
     )
   ) %>%
   addLegend("bottomleft",
