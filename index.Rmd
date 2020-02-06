@@ -4,6 +4,7 @@ output:
   flexdashboard::flex_dashboard:
     orientation: rows
     source_code: embed
+    css: style2.css
   
 ---
 
@@ -99,7 +100,7 @@ filter_checkbox("wheat", "Host group", sd, ~wheat, inline = TRUE)
 ```
 
 
-Row {data-height=300}
+Row {}
 -------------------------------------
 
 

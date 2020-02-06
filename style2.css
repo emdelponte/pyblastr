@@ -6,7 +6,7 @@
 
 
 body {
-     font-size: 16px;
+     font-size: 15px;
      font-family: 'arial', sans-serif
      }
 
@@ -32,7 +32,7 @@ p    {
     }
 .table td {
     padding: 7px;
-    font-size: 80%
+    font-size: 70%
 
 }
 
