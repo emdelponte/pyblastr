@@ -6,7 +6,7 @@
 
 
 body {
-     font-size: 14px;
+     font-size: 16px;
      font-family: 'arial', sans-serif
      }
 
@@ -32,6 +32,13 @@ p    {
     }
 .table td {
     padding: 7px;
-    font-size: 100%
+    font-size: 80%
 
+}
+
+.section.sidebar {
+  top: 61px;
+  border-bottom: 10px solid #ececec;
+  border-left: 10px solid #ececec;
+  background-color: rgba(255, 255, 255, 1);
 }

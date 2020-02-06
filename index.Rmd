@@ -1,16 +1,15 @@
 ---
-title: "Wheat blast tracker"
+title: "Cereal Blast Tracker "
 output: 
   flexdashboard::flex_dashboard:
-    theme: flatly
-    css: style2.css
-    social: menu
-editor_options: 
-  chunk_output_type: inline
+    orientation: rows
+    source_code: embed
+  
 ---
 
 
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
 
 library(flexdashboard)
 library(prettydoc)
@@ -33,16 +32,17 @@ mg_prod <- gsheet2tbl("https://docs.google.com/spreadsheets/d/13xAflAQ-x78Vkq0O0
 
 wb1 <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1iYPjVBNXqwrNwp0lQI2YZnUChfSjVn3b5guuxnYS144/edit?usp=sharing")
 wb_all <- wb1 %>%
+  
   filter(sample != 0) %>%
   filter(region != "UNEMAT") %>%
   mutate(id = case_when(
     is.na(species) ~ "No",
     TRUE ~ "Yes"
-  )) %>% 
+  )) %>%
   mutate(wheat = case_when(
-    host == 'Triticum aestivum' ~ "Wheat",
-    TRUE ~ "Non-wheat"
-  ))
+    host == "Triticum aestivum" ~ "Wheat",
+    TRUE ~ "Non-wheat")) %>% 
+    dplyr::select(code, sample, lat, long, host, city, date, year, PstI_specie, species, wheat, DNA_extraction)    
 
 set.seed(1000)
 wb_all$lat <- round(jitter(wb_all$lat, factor = 1, amount = 0.02), 4)
@@ -66,7 +66,6 @@ wb_grass <- wb1 %>%
 set.seed(1000)
 wb_grass$lat <- round(jitter(wb_grass$lat, factor = 1, amount = 0.01), 4)
 wb_grass$long <- round(jitter(wb_grass$long, factor = 1, amount = 0.01), 4)
-
 ```
 
 
@@ -81,14 +80,10 @@ sd_grass <- SharedData$new(wb_grass)
 ```
 
 
+Inputs {.sidebar}
+-------------------------------------
 
 
-<i class="fa fa-map" aria-hidden="true"></i> Map 
-============
-
-
-Column {data-width=180}
-----------------------------------
 
 ### Quick filter
 
@@ -97,19 +92,31 @@ Column {data-width=180}
 #filter_slider("year", "Select years", sd, ~year)
 filter_select("host", "Select host", sd, ~host)
 filter_select("PstI_specie", "Pyricularia spp.", sd, ~PstI_specie)
+filter_checkbox("DNA_extraction", "DNA extraction", sd, ~DNA_extraction, inline = TRUE)
+filter_checkbox("wheat", "Host group", sd, ~wheat, inline = TRUE)
+
+
 ```
 
 
-
-<input type="button" value="Clean all filters" onClick="window.location.reload()">
-
-
-
-Column {.tabset}
-----------------------------------
+Row {data-height=300}
+-------------------------------------
 
 
+### Plot host species
 
+
+```{r}
+sd %>% 
+  plot_ly(x = ~ wheat,
+          color = ~wheat, 
+          colors = "Set2") %>% 
+  layout(barmode = 'stack',
+         margin=list(l=20,r=20,t=20,b=20)) 
+
+
+
+```
 
 
 
@@ -119,41 +126,37 @@ Column {.tabset}
 ```{r}
 library(RColorBrewer)
 library(htmltools)
-pal <- colorFactor("RdYlGn", domain = c("Wheat", "Non-wheat"))
+pal <- colorFactor("Set2", domain = c("Wheat", "Non-wheat"))
 
 leaflet(data = sd) %>%
-
-  
-   setView(-47.96101,-19.72314, zoom = 4) %>% 
-
-  
-  addProviderTiles(providers$CartoDB.Voyager) %>% 
-  
-  addCircleMarkers(group = "wheat", 
-                   radius = 6, 
-                   fillOpacity = 1, 
-                   weight = 0.5, 
-                   label = paste(wb_all$host,"- Details"), 
-                   fillColor = ~pal(wheat),
-                   popup = paste("Code:<b>", wb_all$'code', "</b>", "<br>",
-                          "Field sample:<b>", wb_all$'sample', "</b>", "<br><i>",       
-                          "Host:<b>", wb_all$'host', "</b></i>", "<br>",       
-                          "Tissue:<b>", wb_all$'tissue', "</b>", "<br>", 
-                          "Field sample:<b>", wb_all$'sample', "</b>", "<br>",
-                          "City:<b>", wb_all$'city', "</b>", "<br>",
-                          "Year:<b>", wb_all$'year', "</b>", "<br>",
-                          "DNA extraction:<b>", wb_all$'DNA_extraction', "</b>", "<br>",
-                          "Species:<b><i>", wb_all$'PstI_specie', "</b>", "<br></i>",
-                          "OBS:<b>", wb_all$'observation', "</b>", "<br>"
-                   ))   %>%
-                     
-  
-  addLegend("bottomleft", 
-            pal = pal, 
-            values = ~wheat, 
-            title = "Host",  
-            opacity = 1 )%>% 
-  
+  setView(-47.96101, -19.72314, zoom = 5) %>%
+  addProviderTiles(providers$CartoDB.Voyager) %>%
+  addCircleMarkers(
+    group = "wheat",
+    radius = 6,
+    fillOpacity = 1,
+    weight = 0.5,
+    label = paste(wb_all$host, "- Details"),
+    fillColor = ~ pal(wheat),
+    popup = paste(
+      "Code:<b>", wb_all$"code", "</b>", "<br>",
+      "Field sample:<b>", wb_all$"sample", "</b>", "<br><i>",
+      "Host:<b>", wb_all$"host", "</b></i>", "<br>",
+      "Tissue:<b>", wb_all$"tissue", "</b>", "<br>",
+      "Field sample:<b>", wb_all$"sample", "</b>", "<br>",
+      "City:<b>", wb_all$"city", "</b>", "<br>",
+      "Year:<b>", wb_all$"year", "</b>", "<br>",
+      "DNA extraction:<b>", wb_all$"DNA_extraction", "</b>", "<br>",
+      "Species:<b><i>", wb_all$"PstI_specie", "</b>", "<br></i>",
+      "OBS:<b>", wb_all$"observation", "</b>", "<br>"
+    )
+  ) %>%
+  addLegend("bottomleft",
+    pal = pal,
+    values = ~wheat,
+    title = "Host",
+    opacity = 1
+  ) %>%
   addEasyButton(easyButton(
     icon = "fa-globe", title = "Back to initial view",
     onClick = JS("function(btn, map){ map.setZoom(2); }")
@@ -161,99 +164,26 @@ leaflet(data = sd) %>%
 ```
 
 
-
-### <i class="fa fa-map" aria-hidden="true"></i> Grass hosts
-
-```{r}
-library(RColorBrewer)
-library(htmltools)
-library(leaflet.providers)
-pal2 <- colorFactor("RdYlGn", domain = c("Cynodon plectostachyus", "Eleusine indica", "Panicum maximum", "Rhynchelytrum roseum", "Urochloa spp."))
-
-
-icons <- awesomeIcons(
-  icon = "circle-o",
-  iconColor = "black",
-  library = "fa",
-  squareMarker = T,
-  markerColor = "green"
-)
-
-leaflet(data = sd_grass) %>%
-
-  
-   setView(-47.96101,-19.72314, zoom = 4) %>% 
-  
-  addProviderTiles(providers$CartoDB.Voyager) %>% 
-  
-  addCircleMarkers(group = "host2", 
-                   radius = 5, 
-                   fillOpacity = 0.8, 
-                   weight = 0.5, 
-                   label = paste(wb_grass$host2,"- Details"), 
-                   fillColor = ~pal2(host2),
-                   popup = paste("Code:<b>", wb_grass$'code', "</b>", "<br>",
-                          "Field sample:<b>", wb_grass$'sample', "</b>", "<br><i>",       
-                          "Host:<b>", wb_grass$'host', "</b></i>", "<br>",       
-                          "Tissue:<b>", wb_grass$'tissue', "</b>", "<br>", 
-                          "Field sample:<b>", wb_grass$'sample', "</b>", "<br>",
-                          "City:<b>", wb_grass$'city', "</b>", "<br>",
-                          "Year:<b>", wb_grass$'year', "</b>", "<br>",
-                          "DNA extraction:<b>", wb_grass$'DNA_extraction', "</b>", "<br>",
-                          "Species:<b><i>", wb_grass$'PstI_specie', "</b>", "<br></i>",
-                          "OBS:", wb_grass$'observation', "<br>"
-                                                    ))   %>%
-  
-
-  addLegend("bottomleft", 
-            pal = pal2, 
-            values = ~host2, 
-            title = "Grass host",  
-            opacity = 1 )%>% 
-  
-  addEasyButton(easyButton(
-    icon = "fa-globe", title = "Back to initial view",
-    onClick = JS("function(btn, map){ map.setZoom(2); }")
-  ))
-```
-
+Row
+----------
 
 
 ### <i class="fa fa-table" aria-hidden="true"></i> Grid display
 
 
 ```{r}
-wb_table <- wb_all %>%
-  dplyr::select(code, sample, host, city, date, year, PstI_specie, species)
-
-
-
-
-datatable(wb_table,
+datatable(sd,
   extensions = c("Buttons", "ColReorder"),
   escape = TRUE, rownames = FALSE,
   class = "cell-border stripe",
   options = list(
     dom = "Bfrtip", buttons = c("excel", "pdf"), deferRender = TRUE,
-    scrollY = 500,
-    pageLength = 50,
+    scrollY = 50,
+    pageLength = 15,
     scroller = TRUE,
     colReorder = TRUE
   )
 )
 ```
-
-
-
-About the database 
-============
-
-
-Column {.tabset}
-----------------------------------
-
-### About
-
-### References
 
 
