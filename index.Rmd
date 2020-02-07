@@ -191,22 +191,6 @@ datatable(sd,
 ```
 
 
-### <i class="fa fa-bar-chart" aria-hidden="true"></i> All hosts
-
-
-```{r}
-sd %>%
-  plot_ly(
-    x = ~host,
-    color = ~host,
-    colors = "Set2",
-    showlegend = FALSE
-  ) %>%
-  layout(
-    barmode = "stack",
-    margin = list(l = 20, r = 20, t = 20, b = 20)
-  )
-```
 
 
 
