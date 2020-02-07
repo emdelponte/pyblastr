@@ -115,7 +115,7 @@ Column {.tabset}
 
 
 
-### <i class="fa fa-map" aria-hidden="true"></i> All hosts
+### <i class="fa fa-map" aria-hidden="true"></i> Map strains
 
 ```{r}
 library(RColorBrewer)
@@ -189,7 +189,6 @@ datatable(sd,
   )
 )
 ```
-
 
 
 
