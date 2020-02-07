@@ -1,11 +1,13 @@
 ---
-title: "Cereal Blast Tracker "
+title: "&nbsp;"
 output: 
   flexdashboard::flex_dashboard:
-    orientation: rows
-    source_code: embed
+    source_code: embe
+    theme: united
+    social: menu
     css: style2.css
-  
+    logo: logo.png
+    
 ---
 
 
@@ -33,7 +35,6 @@ mg_prod <- gsheet2tbl("https://docs.google.com/spreadsheets/d/13xAflAQ-x78Vkq0O0
 
 wb1 <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1iYPjVBNXqwrNwp0lQI2YZnUChfSjVn3b5guuxnYS144/edit?usp=sharing")
 wb_all <- wb1 %>%
-  
   filter(sample != 0) %>%
   filter(region != "UNEMAT") %>%
   mutate(id = case_when(
@@ -42,8 +43,9 @@ wb_all <- wb1 %>%
   )) %>%
   mutate(wheat = case_when(
     host == "Triticum aestivum" ~ "Wheat",
-    TRUE ~ "Non-wheat")) %>% 
-    dplyr::select(code, sample, lat, long, host, city, date, year, PstI_specie, species, wheat, DNA_extraction)    
+    TRUE ~ "Non-wheat"
+  )) %>%
+  dplyr::select(code, sample, lat, long, host, city, date, year, PstI_specie, species, wheat, DNA_extraction)
 
 set.seed(1000)
 wb_all$lat <- round(jitter(wb_all$lat, factor = 1, amount = 0.02), 4)
@@ -74,16 +76,20 @@ wb_grass$long <- round(jitter(wb_grass$long, factor = 1, amount = 0.01), 4)
 ```{r all table, echo=FALSE}
 library(crosstalk)
 library(leaflet)
-library(leaflet.extras)
+
 library(DT)
 row.names(wb_all) <- NULL
 wb_all <- as.data.frame(wb_all)
-sd <- SharedData$new(wb_all, key = ~code)
+sd <- SharedData$new(wb_all)
 sd_grass <- SharedData$new(wb_grass)
 ```
 
 
-Inputs {.sidebar}
+Home > interactive dashboard 
+============
+
+
+Column {.sidebar}
 -------------------------------------
 
 
@@ -92,34 +98,19 @@ Inputs {.sidebar}
 
 
 ```{r}
-#filter_slider("year", "Select years", sd, ~year)
-filter_select("host", "Select host", sd, ~host)
-filter_select("PstI_specie", "Pyricularia spp.", sd, ~PstI_specie)
-filter_checkbox("DNA_extraction", "DNA extraction", sd, ~DNA_extraction, inline = TRUE)
+filter_slider("year", "Select years", sd, ~year)
 filter_checkbox("wheat", "Host group", sd, ~wheat, inline = TRUE)
+filter_select("host", "Host name", sd, ~host)
+filter_checkbox("DNA_extraction", "DNA extracted?", sd, ~DNA_extraction, inline = TRUE)
+filter_select("PstI_specie", "Species ID", sd, ~PstI_specie)
 
 
 ```
 
 
-Row {}
+Column {.tabset}
 -------------------------------------
 
-
-### Plot host species
-
-
-```{r}
-sd %>% 
-  plot_ly(x = ~ wheat,
-          color = ~wheat, 
-          colors = "Set2") %>% 
-  layout(barmode = 'stack',
-         margin=list(l=20,r=20,t=20,b=20)) 
-
-
-
-```
 
 
 
@@ -131,18 +122,17 @@ library(RColorBrewer)
 library(htmltools)
 pal <- colorFactor("Set2", domain = c("Wheat", "Non-wheat"))
 
-leaflet(data = sd, width = '100%') %>%
-  setView(-47.96101, -19.72314, zoom = 5) %>%
-  addProviderTiles("Esri.WorldImagery", group = 'Aerial') %>%
-  addProviderTiles("OpenStreetMap.Mapnik", group = 'Street') %>%
-  addProviderTiles("OpenTopoMap", group = 'Terrain') %>%
-  addScaleBar('bottomright') %>%
-  addProviderTiles(providers$CartoDB.Voyager, group = 'Default') %>%
+leaflet(data = sd, width = "100%") %>%
+  setView(-47.96101, -19.72314, zoom = 7) %>%
+  addProviderTiles("Esri.WorldImagery", group = "Aerial") %>%
+  addProviderTiles("OpenTopoMap", group = "Terrain") %>%
+  addScaleBar("bottomright") %>%
+  addProviderTiles(providers$CartoDB.Voyager, group = "Default") %>%
   addLayersControl(
-        baseGroups = c("Default", "Aerial", "Street", "Terrain"),
-        overlayGroups = 'wheat',
-        options = layersControlOptions(collapsed = TRUE)
-      ) %>% 
+    baseGroups = c("Default", "Aerial", "Terrain"),
+    overlayGroups = "wheat",
+    options = layersControlOptions(collapsed = FALSE)
+  ) %>%
   addCircleMarkers(
     group = "wheat",
     radius = 6,
@@ -151,16 +141,16 @@ leaflet(data = sd, width = '100%') %>%
     label = paste(wb_all$host, "- Details"),
     fillColor = ~ pal(wheat),
     popup = paste(
-      '<h3>Isolate details</h3>',
+      "<h3>Isolate details</h3>",
       "Code:", wb_all$"code", "<br>",
-      "Field sample:", wb_all$"sample","<br><i>",
+      "Field sample:", wb_all$"sample", "<br><i>",
       "Host:", wb_all$"host", "</i>", "<br>",
-      "Tissue:", wb_all$"tissue",  "<br>",
-      "Field sample:", wb_all$"sample",  "<br>",
+      "Tissue:", wb_all$"tissue", "<br>",
+      "Field sample:", wb_all$"sample", "<br>",
       "City:", wb_all$"city", "<br>",
-      "Year:", wb_all$"year",  "<br>",
-      "DNA extraction:", wb_all$"DNA_extraction",  "<br>",
-      "Species:<i>", wb_all$"PstI_specie",  "<br></i>",
+      "Year:", wb_all$"year", "<br>",
+      "DNA extraction:", wb_all$"DNA_extraction", "<br>",
+      "Species:<i>", wb_all$"PstI_specie", "<br></i>",
       "OBS:", wb_all$"observation", "", "<br>"
     )
   ) %>%
@@ -169,19 +159,20 @@ leaflet(data = sd, width = '100%') %>%
     values = ~wheat,
     title = "Host",
     opacity = 1
-  ) %>%
+  ) %>% 
+  addMeasure(
+    position = "bottomleft",
+    primaryLengthUnit = "meters",
+    primaryAreaUnit = "sqmeters",
+    activeColor = "#3D535D",
+    completedColor = "#7D4479") %>% 
   addEasyButton(easyButton(
-    icon = "fa-globe", title = "Back to initial view",
-    onClick = JS("function(btn, map){ map.setZoom(2); }")
-  ))
+    icon="fa-globe", title="Zoom to Level 1",
+    onClick=JS("function(btn, map){ map.setZoom(1); }"))) 
 ```
 
 
-Row
-----------
-
-
-### <i class="fa fa-table" aria-hidden="true"></i> Grid display
+### <i class="fa fa-table" aria-hidden="true"></i> View grid display
 
 
 ```{r}
@@ -198,5 +189,30 @@ datatable(sd,
   )
 )
 ```
+
+
+### <i class="fa fa-bar-chart" aria-hidden="true"></i> All hosts
+
+
+```{r}
+sd %>%
+  plot_ly(
+    x = ~host,
+    color = ~host,
+    colors = "Set2",
+    showlegend = FALSE
+  ) %>%
+  layout(
+    barmode = "stack",
+    margin = list(l = 20, r = 20, t = 20, b = 20)
+  )
+```
+
+
+
+About the project
+============
+
+### Test
 
 
