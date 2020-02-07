@@ -130,7 +130,7 @@ leaflet(data = sd, width = "100%") %>%
   addProviderTiles(providers$CartoDB.Voyager, group = "Default") %>%
   addLayersControl(
     baseGroups = c("Default", "Aerial", "Terrain"),
-    overlayGroups = "wheat",
+    overlayGroups = "Blast pathogen",
     options = layersControlOptions(collapsed = FALSE)
   ) %>%
   addCircleMarkers(
