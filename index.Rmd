@@ -2,7 +2,7 @@
 title: "&nbsp;"
 output: 
   flexdashboard::flex_dashboard:
-    source_code: embe
+    source_code: embed
     theme: united
     social: menu
     css: style2.css
