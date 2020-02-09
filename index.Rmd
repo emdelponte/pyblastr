@@ -12,8 +12,11 @@ output:
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
-
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = FALSE,
+	warning = FALSE
+)
 library(flexdashboard)
 library(prettydoc)
 library(readxl)
@@ -23,6 +26,9 @@ library(plotly)
 library(viridis)
 library(gsheet)
 library(leaflet.providers)
+library(leaflet)
+library(DT)
+library(cowplot)
 ```
 
 
@@ -33,7 +39,7 @@ Sys.setlocale("LC_ALL", "pt_BR.UTF-8")
 
 mg_prod <- gsheet2tbl("https://docs.google.com/spreadsheets/d/13xAflAQ-x78Vkq0O0jUEkUxHPq5G1R4gwqzillMxoTo/edit?usp=sharing")
 
-wb1 <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1iYPjVBNXqwrNwp0lQI2YZnUChfSjVn3b5guuxnYS144/edit?usp=sharing")
+wb1 <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1x3KKDGIwdPQdG3YE5Ekn1iExMrqV76ndJbXAgLe7dsA/edit?usp=sharing")
 wb_all <- wb1 %>%
   filter(sample != 0) %>%
   filter(region != "UNEMAT") %>%
@@ -48,44 +54,19 @@ wb_all <- wb1 %>%
   dplyr::select(code, sample, lat, long, host, city, date, year, PstI_specie, species, wheat, DNA_extraction)
 
 set.seed(1000)
-wb_all$lat <- round(jitter(wb_all$lat, factor = 1, amount = 0.02), 4)
-wb_all$long <- round(jitter(wb_all$long, factor = 1, amount = 0.02), 4)
+wb_all$lat <- round(jitter(wb_all$lat, factor = 1, amount = 0.001), 4)
+wb_all$long <- round(jitter(wb_all$long, factor = 1, amount = 0.001), 4)
 
-wb_grass <- wb1 %>%
-  filter(sample != 0) %>%
-  filter(region != "UNEMAT") %>%
-  mutate(id = case_when(
-    is.na(species) ~ "No",
-    TRUE ~ "Yes"
-  )) %>%
-  filter(host == "Eleusine indica" | host == "Panicum maximum" | host == "Urochloa brizantha" | host == "Rhynchelytrum roseum" | host == "Urochloa humidicola" | host == "Urochloa plantaginea" | host == "Cynodon plectostachyus") %>%
-  mutate(host2 = case_when(
-    host == "Urochloa brizantha" ~ "Urochloa spp.",
-    host == "Urochloa humidicola" ~ "Urochloa spp.",
-    host == "Urochloa plantaginea" ~ "Urochloa spp.",
-    TRUE ~ host
-  ))
-
-set.seed(1000)
-wb_grass$lat <- round(jitter(wb_grass$lat, factor = 1, amount = 0.01), 4)
-wb_grass$long <- round(jitter(wb_grass$long, factor = 1, amount = 0.01), 4)
 ```
 
 
 
 ```{r all table, echo=FALSE}
-library(crosstalk)
-library(leaflet)
-
-library(DT)
-row.names(wb_all) <- NULL
-wb_all <- as.data.frame(wb_all)
 sd <- SharedData$new(wb_all)
-sd_grass <- SharedData$new(wb_grass)
 ```
 
 
-Home > interactive dashboard 
+Dashboard 
 ============
 
 
@@ -112,9 +93,6 @@ Column {.tabset}
 -------------------------------------
 
 
-
-
-
 ### <i class="fa fa-map" aria-hidden="true"></i> Map strains
 
 ```{r}
@@ -123,7 +101,7 @@ library(htmltools)
 pal <- colorFactor("Set2", domain = c("Wheat", "Non-wheat"))
 
 leaflet(data = sd, width = "100%") %>%
-  setView(-46.8, -20.40, zoom = 4) %>%
+  setView(-46.8, -20.40, zoom = 6) %>%
   addProviderTiles("Esri.WorldImagery", group = "Aerial") %>%
   addProviderTiles("OpenTopoMap", group = "Terrain") %>%
   addScaleBar("bottomright") %>%
@@ -131,15 +109,17 @@ leaflet(data = sd, width = "100%") %>%
   addLayersControl(
     baseGroups = c("Default", "Aerial", "Terrain"),
     overlayGroups = "Blast pathogen",
-    options = layersControlOptions(collapsed = FALSE)
+    options = layersControlOptions(collapsed = T)
   ) %>%
   addCircleMarkers(
+  
     group = "wheat",
     radius = 6,
     fillOpacity = 1,
     weight = 0.5,
     label = paste(wb_all$host, "- Details"),
     fillColor = ~ pal(wheat),
+
     popup = paste(
       "<h3>Isolate details</h3>",
       "Code:", wb_all$"code", "<br>",
@@ -160,6 +140,7 @@ leaflet(data = sd, width = "100%") %>%
     title = "Host",
     opacity = 1
   ) %>% 
+  
   addMeasure(
     position = "bottomleft",
     primaryLengthUnit = "meters",
@@ -167,8 +148,8 @@ leaflet(data = sd, width = "100%") %>%
     activeColor = "#3D535D",
     completedColor = "#7D4479") %>% 
   addEasyButton(easyButton(
-    icon="fa-globe", title="Zoom to Level 1",
-    onClick=JS("function(btn, map){ map.setZoom(1); }"))) 
+    icon="fa-globe", title="Zoom to Level 3",
+    onClick=JS("function(btn, map){ map.setZoom(3); }"))) 
 ```
 
 
@@ -196,6 +177,29 @@ datatable(sd,
 About the project
 ============
 
-### Test
+
+Column {.sidebar}
+-------------------------------------
+
+
+
+### Participants
+
+<img sr = "logo.png">
+
+
+Column {.tabset}
+-------------------------------------
+
+
+### About
+
+
+This is a text
+
+### How to use it
+
+
+
 
 
