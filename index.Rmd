@@ -2,12 +2,14 @@
 title: "&nbsp;"
 output: 
   flexdashboard::flex_dashboard:
+    
     source_code: embed
     theme: united
     social: menu
     css: style2.css
     logo: logo.png
-    
+editor_options: 
+  chunk_output_type: inline
 ---
 
 
@@ -68,6 +70,7 @@ wb_all$lon <- round(jitter(wb_all$lon, factor = 1, amount = 0.001), 4)
 
 ```{r all table, echo=FALSE}
 sd <- SharedData$new(wb_all)
+sd2 <- SharedData$new(wb_all)
 ```
 
 
@@ -176,6 +179,29 @@ datatable(sd,
 
 
 
+### <i class="fa fa-chart-bar" aria-hidden="true"></i> Charts
+
+
+
+```{r}
+
+p1 <- 
+  plot_ly(wb_all, x = ~host_binomial) %>% 
+add_histogram()
+  
+p2 <- wb_all %>% 
+  count(py_binomial) %>%
+  plot_ly(x = ~py_binomial, y = ~n) %>% 
+  add_bars()
+
+
+subplot(p1, p2) %>% hide_legend()
+
+```
+
+
+
+
 
 About this dashboard
 ============
@@ -183,16 +209,7 @@ About this dashboard
 
 Column {.sidebar}
 -------------------------------------
-
-
-
-### Participants
-<br>
-Dr. Emerson Del Ponte  
-MSc. João Ascari  
-MSc. Ignácio Cazón
-Dr. Mark Farman  
-
+<img src = "pyblast1.jpeg">
 
 Column {.tabset}
 -------------------------------------
@@ -203,16 +220,28 @@ Column {.tabset}
 
 <h3>What is <b>Pyblastr</b>?</h3>
 
-> A  <u>database</u> of information on characterized fungal strains of <i>Pyricularia</i>, the genus name for a complex of species that cause blast symptoms on both leaves and reproductive organs of agriculturally important Poacea (eg. wheat blast) and grasses in general, including turfgrass. 
+> A  <u>database</u> of information on characterized fungal strains of <i>Pyricularia</i>, the genus that encompasses a complex of species that cause blast symptoms on both leaves and reproductive organs of agriculturally important Poacea (eg. wheat blast) and grasses in general, including turfgrass. 
 
 <h3>What is it useful for?</h3>
->The dashboard contains tabular and graphical elements for displaying information for each georeferenced strain, thus allowing to track  temporal and spatial spread of species and host-specific lineages (or pathotypes) isolated from both wheat and grasses. 
+>The dashboard contains tabular and graphical elements for displaying information for a georeferenced *Pyricularia* strain of a distinct species and host-specific lineages (or pathotypes) isolated from both wheat and grasses. Combined with the informaton on the year of sampling, it allows to track the temporal and spatial spread of the pathogen.
 
 <h3>Who are we?</h3>
-><b>Pyblastr</b> was created during the conduction of PhD research projects at the Plant Disease Epidemiology Laboratory (Dr. Del Ponte) in collaboration with Dr. Farman (University of Kentucky). The first version was released on February 2020 and is expected to be continuously updated. 
+><b>Pyblastr</b> was created during the conduction of PhD research projects at the Plant Disease Epidemiology Laboratory (Dr. Emerson Del Ponte) in collaboration with Dr. Mark Farman (University of Kentucky). The first version was released on February 2020 and is expected to be continuously updated. 
 
 <h3>May I contribute data?</h3>
->Yes! definitely this is an open database that we would like to extend  its utility by allowing other researches to contribution data to populate the global map. Get in touch (delponte@ufv.br) to receive instructions on how to participate and include the data in a Google sheets.
+>Yes! definitely. All datasets and codes for are built using open source tools and are available on [GitHub](https://github.com/emdelponte/pyblastr). We would like to extend  the utility of this project by allowing other researches to contribute data to populate the global map. Get in touch (delponte@ufv.br) to receive instructions on how to participate and include your data.
+
+
+<h3>Current contributors</h3>
+
+
+Dr. Emerson Del Ponte (UFV, Viçosa Brazil)  
+Dr. Mark Farman (U.K. Lexington, US)  
+MSc. João Ascari  (UFV, Viçosa Brazil)  
+MSc. Ignácio Cazón (UFV, Viçosa Brazil)
+
+
+
 
 <h3> Key wheat blast resources</H3>
 <blockquote>
@@ -222,13 +251,13 @@ Reviews
 [Wheat blast: from its origins in South America to its emergence as a global threat](https://bsppjournals.onlinelibrary.wiley.com/doi/full/10.1111/mpp.12747)
 
 Websites   
-[Open Wheat Blast Initiative](http://openwheatblast.net/)   
-[Cimmyt](https://www.cimmyt.org/news/what-is-wheat-blast/)   [CABi](https://www.cabi.org/isc/datasheet/121970)  
+[ Open Wheat Blast Initiative](http://openwheatblast.net/)   | 
+[Cimmyt](https://www.cimmyt.org/news/what-is-wheat-blast/)   |  [ CABi](https://www.cabi.org/isc/datasheet/121970)  
 
 Webinars  
-[Wheat Blast: Epidemiology and management of an emerging global threat. Dr. Cruz ](https://www.youtube.com/watch?v=gf1UFz926og&amp;t=1188s)  
-[Symptoms of Wheat Blast Under Controlled Conditions, P.K. Malaker](https://www.youtube.com/watch?v=9KfqahgmASE)  
-[Wheat blast infected field in Bangladesh, 2017. Dr. Malaker](https://www.youtube.com/watch?v=pnD3qCRruK8)  
+[ Wheat Blast: Epidemiology and management of an emerging global threat. Dr. Cruz ](https://www.youtube.com/watch?v=gf1UFz926og&amp;t=1188s)  
+[ Symptoms of Wheat Blast Under Controlled Conditions, P.K. Malaker](https://www.youtube.com/watch?v=9KfqahgmASE)  
+[ Wheat blast infected field in Bangladesh, 2017. Dr. Malaker](https://www.youtube.com/watch?v=pnD3qCRruK8)  
 </blockquote>
 
 
