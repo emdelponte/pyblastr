@@ -209,7 +209,7 @@ About this dashboard
 
 Column {.sidebar}
 -------------------------------------
-<img src = "pyblast1.jpeg">
+<img src = "pyblast2.jpeg">
 
 Column {.tabset}
 -------------------------------------
