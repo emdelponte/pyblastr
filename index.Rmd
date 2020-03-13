@@ -20,8 +20,6 @@ knitr::opts_chunk$set(
 	warning = FALSE
 )
 library(flexdashboard)
-library(prettydoc)
-library(readxl)
 library(tidyverse)
 library(crosstalk)
 library(plotly)
@@ -30,7 +28,7 @@ library(gsheet)
 library(leaflet.providers)
 library(leaflet)
 library(DT)
-library(cowplot)
+library(janitor)
 ```
 
 
@@ -179,28 +177,74 @@ datatable(sd,
 
 
 
-### <i class="fa fa-chart-bar" aria-hidden="true"></i> Charts
+### <i class="fa fa-chart-bar" aria-hidden="true"></i> Chart strains by host
 
 
 
 ```{r}
 
-p1 <- 
-  plot_ly(wb_all, x = ~host_binomial) %>% 
-add_histogram()
+
+p_host <- wb_all %>% 
+  tabyl(host_binomial) %>% 
+  ggplot(aes(reorder(host_binomial, n), n))+
+  geom_col(fill = "#558796")+
+  theme_minimal()+
+  coord_flip()+
+  theme(legend.position = "none", 
+        plot.margin = margin(2, 2, 2, 2, "cm"))+
+  labs(x = "", y = "Number of strains", title = "Host species")
   
-p2 <- wb_all %>% 
-  count(py_binomial) %>%
-  plot_ly(x = ~py_binomial, y = ~n) %>% 
-  add_bars()
+ggplotly(p_host)
+  
+  
 
 
-subplot(p1, p2) %>% hide_legend()
+```
+
+### <i class="fa fa-chart-bar" aria-hidden="true"></i> Chart strains by Species
+
+```{r}
+library(janitor)
+
+p_py <- wb_all %>% 
+  filter(py_binomial != "NA") %>% 
+  tabyl(py_binomial) %>% 
+    ggplot(aes(reorder(py_binomial, n), n))+
+geom_col(fill = "#558796")+
+  theme_minimal()+
+  coord_flip()+
+  theme(legend.position = "none", plot.margin = margin(2, 2, 2, 2, "cm"))+
+  labs(x = "", y = "Number of strains", title = "Pyricularia spp.")
+  
+ggplotly(p_py)
+  
+  
+
 
 ```
 
 
+### <i class="fa fa-chart-bar" aria-hidden="true"></i> Chart strains by lineages
 
+```{r}
+library(janitor)
+
+p_lin <- wb_all %>% 
+  filter(py_lineage != "NA") %>% 
+  tabyl(py_lineage) %>% 
+    ggplot(aes(reorder(py_lineage, n), n))+
+  geom_col(fill = "#558796")+
+  theme_minimal()+
+  coord_flip()+
+  theme(legend.position = "none", plot.margin = margin(2, 2, 2, 2, "cm"))+
+  labs(x = "", y = "Number of strains", title = "P. oryzae lineages")
+  
+ggplotly(p_lin)
+  
+  
+
+
+```
 
 
 About this dashboard
@@ -209,13 +253,13 @@ About this dashboard
 
 Column {.sidebar}
 -------------------------------------
-<img src = "pyblast2.jpeg">
+<br><img src = "pyblast2.jpeg">
 
 Column {.tabset}
 -------------------------------------
 
 
-### About this project
+### About this database
 
 
 <h3>What is <b>Pyblastr</b>?</h3>
