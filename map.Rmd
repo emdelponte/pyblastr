@@ -81,7 +81,7 @@ library(htmltools)
 pal <- colorFactor("Set2", domain = c("Wheat", "Non-wheat"))
 
 leaflet(data = sd, width = "100%") %>%
- # setView(-46.8, -20.40, zoom = 7) %>%
+ setView(-46.8, -20.40, zoom = 4) %>%
   addProviderTiles("Esri.WorldImagery", group = "Aerial") %>%
   addProviderTiles("OpenTopoMap", group = "Terrain") %>%
   addScaleBar("bottomright") %>%
