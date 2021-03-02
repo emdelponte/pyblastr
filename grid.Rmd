@@ -1,0 +1,76 @@
+---
+title: "&nbsp;"
+output:
+  distill::distill_article
+
+---
+
+
+```{r setup, include=FALSE}
+
+library(gsheet)
+library(tidyverse)
+library(crosstalk)
+library(DT)
+library(ggthemes)
+library(janitor)
+library(cowplot)
+library(plotly)
+
+Sys.setlocale("LC_ALL", "pt_BR.UTF-8")
+
+
+mg_prod <- gsheet2tbl("https://docs.google.com/spreadsheets/d/13xAflAQ-x78Vkq0O0jUEkUxHPq5G1R4gwqzillMxoTo/edit?usp=sharing")
+
+
+
+wb2<- gsheet2tbl("https://docs.google.com/spreadsheets/d/1W5nJWJwQJRKyUfWeiQNNA2xdQUsbEeCX6g6FH_i7i4o/edit#gid=532754791")
+
+
+wb_all <- wb2 %>%
+  filter(labcode != 0) %>%
+    mutate(id = case_when(
+    is.na(py_binomial) ~ "No",
+    TRUE ~ "Yes"
+  )) %>%
+  mutate(wheat = case_when(
+    host_binomial == "Triticum aestivum" ~ "Wheat",
+    TRUE ~ "Non-wheat"
+  ))
+
+wb_all <- wb_all %>% 
+  dplyr::select(labcode, year, state_province, host_binomial, py_binomial, py_lineage, primer, seq_locus)
+
+
+sd <- SharedData$new(wb_all)
+sd2 <- SharedData$new(wb_all)
+
+```
+
+
+```{r echo=FALSE, layout="l-page"}
+library(crosstalk)
+bscols(
+
+
+filter_select("host", "Host binomial", sd, ~host_binomial),
+filter_select("py_species", "Pyricularia sp.", sd, ~py_binomial),
+filter_select("py_lineage", "P. oryzae lineage", sd, ~py_lineage)
+
+)
+
+ datatable(sd, rownames = FALSE,
+           extensions = c("Buttons"),
+             class = 'table-bordered table-condensed',
+           options = list(
+    dom = "Bfrtip", 
+    pageLength = 15,
+    buttons = c("excel")))
+           
+
+
+```
+
+
+
+

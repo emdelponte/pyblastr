@@ -1,0 +1,138 @@
+---
+title: "&nbsp;"
+output:
+  distill::distill_article:
+    toc: true
+    toc_depth: 3
+
+---
+
+
+
+```{r setup, include=FALSE}
+
+library(gsheet)
+library(tidyverse)
+library(crosstalk)
+library(DT)
+library(ggthemes)
+library(janitor)
+library(cowplot)
+library(plotly)
+library(flexdashboard)
+library(tidyverse)
+library(crosstalk)
+library(plotly)
+library(viridis)
+library(leaflet.providers)
+library(leaflet)
+
+
+
+Sys.setlocale("LC_ALL", "pt_BR.UTF-8")
+
+
+mg_prod <- gsheet2tbl("https://docs.google.com/spreadsheets/d/13xAflAQ-x78Vkq0O0jUEkUxHPq5G1R4gwqzillMxoTo/edit?usp=sharing")
+
+
+
+wb2<- gsheet2tbl("https://docs.google.com/spreadsheets/d/1W5nJWJwQJRKyUfWeiQNNA2xdQUsbEeCX6g6FH_i7i4o/edit#gid=532754791")
+
+
+wb_all <- wb2 %>%
+  filter(labcode != 0) %>%
+    mutate(id = case_when(
+    is.na(py_binomial) ~ "No",
+    TRUE ~ "Yes"
+  )) %>%
+  mutate(wheat = case_when(
+    host_binomial == "Triticum aestivum" ~ "Wheat",
+    TRUE ~ "Non-wheat"
+  ))
+
+wb_all <- wb_all %>% 
+  dplyr::select(labcode, year, lat, lon, state_province, host_binomial, py_binomial, py_lineage, primer, seq_locus, wheat, county_municipality, DNA_extraction)
+
+
+sd <- SharedData$new(wb_all)
+sd2 <- SharedData$new(wb_all)
+
+```
+
+
+```{r echo=FALSE}
+bscols(
+
+
+filter_select("host", "Host binomial", sd, ~host_binomial),
+filter_select("py_species", "Pyricularia sp.", sd, ~py_binomial),
+filter_select("py_lineage", "P. oryzae lineage", sd, ~py_lineage)
+
+)
+```
+
+
+```{r echo=FALSE, layout="l-screen-inset shaded", fig.height=5}
+library(crosstalk)
+
+
+library(RColorBrewer)
+library(htmltools)
+pal <- colorFactor("Set2", domain = c("Wheat", "Non-wheat"))
+
+leaflet(data = sd, width = "100%") %>%
+ # setView(-46.8, -20.40, zoom = 7) %>%
+  addProviderTiles("Esri.WorldImagery", group = "Aerial") %>%
+  addProviderTiles("OpenTopoMap", group = "Terrain") %>%
+  addScaleBar("bottomright") %>%
+  addProviderTiles(providers$CartoDB.Voyager, group = "Default") %>%
+  addLayersControl(
+    baseGroups = c("Default", "Aerial", "Terrain"),
+    overlayGroups = "Blast pathogen",
+    options = layersControlOptions(collapsed = T)
+  ) %>%
+  addCircleMarkers(
+  
+    group = "wheat",
+    radius = 6,
+    fillOpacity = 1,
+    weight = 0.5,
+    label = paste(wb_all$host, "- Details"),
+    fillColor = ~ pal(wheat),
+
+    popup = paste(
+      "<h3>Isolate details</h3>",
+      "Code:", wb_all$"labcode", "<br>",
+      
+      "Host:", wb_all$"host_binomial", "</i>", "<br>",
+       "City:", wb_all$"county_municipality", "<br>",
+      "Year:", wb_all$"year", "<br>",
+      "DNA extraction:", wb_all$"DNA_extraction", "<br>",
+      "Species:<i>", wb_all$"py_binomial", "<br></i>",
+        "Lineage:<i>", wb_all$"py_lineage", "<br></i>"
+    )
+  ) %>%
+  addLegend("bottomleft",
+    pal = pal,
+    values = ~wheat,
+    title = "Host",
+    opacity = 1
+  ) %>% 
+  
+  addMeasure(
+    position = "bottomleft",
+    primaryLengthUnit = "meters",
+    primaryAreaUnit = "sqmeters",
+    activeColor = "#3D535D",
+    completedColor = "#7D4479") %>% 
+  addEasyButton(easyButton(
+    icon="fa-globe", title="Zoom to Level 3",
+    onClick=JS("function(btn, map){ map.setZoom(3); }")))
+
+
+
+```
+
+
+
+
