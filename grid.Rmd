@@ -20,11 +20,11 @@ library(plotly)
 Sys.setlocale("LC_ALL", "pt_BR.UTF-8")
 
 
-mg_prod <- gsheet2tbl("https://docs.google.com/spreadsheets/d/13xAflAQ-x78Vkq0O0jUEkUxHPq5G1R4gwqzillMxoTo/edit?usp=sharing")
+#mg_prod <- gsheet2tbl("https://docs.google.com/spreadsheets/d/13xAflAQ-x78Vkq0O0jUEkUxHPq5G1R4gwqzillMxoTo/edit?usp=sharing")
 
 
 
-wb2<- gsheet2tbl("https://docs.google.com/spreadsheets/d/1W5nJWJwQJRKyUfWeiQNNA2xdQUsbEeCX6g6FH_i7i4o/edit#gid=532754791")
+wb2<- gsheet2tbl("https://docs.google.com/spreadsheets/d/1R6UXFcsbVgpPYyvfkPvZ81rqkyk4U_9aS7qV8TKPsxQ/edit?usp=sharing")
 
 
 wb_all <- wb2 %>%
@@ -39,7 +39,7 @@ wb_all <- wb2 %>%
   ))
 
 wb_all <- wb_all %>% 
-  dplyr::select(labcode, year, state_province, host_binomial, py_binomial, py_lineage, primer, seq_locus)
+  dplyr::select(labcode, year, country, state_province, collector, host_binomial, py_binomial, py_lineage)
 
 
 sd <- SharedData$new(wb_all)

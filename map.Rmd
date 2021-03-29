@@ -36,7 +36,7 @@ mg_prod <- gsheet2tbl("https://docs.google.com/spreadsheets/d/13xAflAQ-x78Vkq0O0
 
 
 
-wb2<- gsheet2tbl("https://docs.google.com/spreadsheets/d/1W5nJWJwQJRKyUfWeiQNNA2xdQUsbEeCX6g6FH_i7i4o/edit#gid=532754791")
+wb2<- gsheet2tbl("https://docs.google.com/spreadsheets/d/1R6UXFcsbVgpPYyvfkPvZ81rqkyk4U_9aS7qV8TKPsxQ/edit?usp=sharing")
 
 
 wb_all <- wb2 %>%
@@ -51,7 +51,7 @@ wb_all <- wb2 %>%
   ))
 
 wb_all <- wb_all %>% 
-  dplyr::select(labcode, year, lat, lon, state_province, host_binomial, py_binomial, py_lineage, primer, seq_locus, wheat, county_municipality, DNA_extraction)
+  dplyr::select(labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
 
 
 sd <- SharedData$new(wb_all)
@@ -64,9 +64,9 @@ sd2 <- SharedData$new(wb_all)
 bscols(
 
 
-filter_select("host", "Host binomial", sd, ~host_binomial),
-filter_select("py_species", "Pyricularia sp.", sd, ~py_binomial),
-filter_select("py_lineage", "P. oryzae lineage", sd, ~py_lineage)
+filter_select("host", "Origin host", sd, ~ host_binomial),
+filter_select("py_species", "Pyricularia species", sd, ~ py_binomial),
+filter_select("py_lineage", "P. oryzae lineage", sd, ~ py_lineage)
 
 )
 ```
@@ -103,13 +103,12 @@ leaflet(data = sd, width = "100%") %>%
     popup = paste(
       "<h3>Isolate details</h3>",
       "Code:", wb_all$"labcode", "<br>",
-      
       "Host:", wb_all$"host_binomial", "</i>", "<br>",
        "City:", wb_all$"county_municipality", "<br>",
       "Year:", wb_all$"year", "<br>",
-      "DNA extraction:", wb_all$"DNA_extraction", "<br>",
       "Species:<i>", wb_all$"py_binomial", "<br></i>",
-        "Lineage:<i>", wb_all$"py_lineage", "<br></i>"
+        "Lineage:<i>", wb_all$"py_lineage", "<br></i>",
+      "Collector:", wb_all$"collector", "<br>"
     )
   ) %>%
   addLegend("bottomleft",
