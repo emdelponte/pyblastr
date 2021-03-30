@@ -11,12 +11,10 @@
 /* Optional: embed custom fonts here with `@import`          */
 /* This must remain at the top of this file.                 */
 
-
-
 html {
   /*-- Main font sizes --*/
-  --title-size:      50px;
-  --body-size:       1rem;
+  --title-size:      28px;
+  --body-size:       0.9rem;
   --code-size:       14px;
   --aside-size:      12px;
   --fig-cap-size:    13px;
@@ -54,6 +52,7 @@ d-appendix {
   --text-size:       0.9em;
   --text-color:      rgba(0, 0, 0, 0.5);
 }
+
 
 /*-- WEBSITE HEADER + FOOTER --*/
 /* These properties only apply to Distill sites and blogs  */

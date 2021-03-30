@@ -1,103 +1,35 @@
 ---
 title: "&nbsp;"
 output:
-  distill::distill_article:
-    toc: true
-    toc_depth: 3
-
+  distill::distill_article
 ---
 
-
 ```{r setup, include=FALSE}
-library(gsheet)
-library(tidyverse)
-library(crosstalk)
-library(DT)
-library(ggthemes)
-library(janitor)
-library(cowplot)
-library(plotly)
-library(flexdashboard)
-library(tidyverse)
-library(crosstalk)
-library(plotly)
-library(viridis)
-library(leaflet.providers)
-library(leaflet)
-
-Sys.setlocale("LC_ALL", "pt_BR.UTF-8")
-
-
-
-#DelPonte Lab
-delponte = gsheet2tbl("https://docs.google.com/spreadsheets/d/1R6UXFcsbVgpPYyvfkPvZ81rqkyk4U_9aS7qV8TKPsxQ/edit?usp=sharing")
-delponte_all <- delponte %>%
-  filter(labcode != 0) %>%
-    mutate(id = case_when(
-    is.na(py_binomial) ~ "No",
-    TRUE ~ "Yes"
-  )) %>%
-  mutate(wheat = case_when(
-    host_binomial == "Triticum aestivum" ~ "Wheat",
-    TRUE ~ "Non-wheat"
-  )) %>% 
-  mutate(lab = "DelPonte-Lab")
-
-delponte_all = delponte_all %>% 
-  dplyr::select(lab, labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
-
-
-#Kamoun lab
-kamoun = gsheet2tbl("https://docs.google.com/spreadsheets/d/13PyoQobtdE3xessW14rHud45MlXUOsMOgKDWG81kxCc/edit#gid=1082341206")
-kamoun_all = kamoun %>%
-  filter(labcode != 0) %>%
-    mutate(id = case_when(
-    is.na(py_binomial) ~ "No",
-    TRUE ~ "Yes"
-  )) %>%
-  mutate(wheat = case_when(
-    host_binomial == "Triticum aestivum" ~ "Wheat",
-    TRUE ~ "Non-wheat"
-  )) %>% 
-  mutate(lab = "Kamoun-Lab")
-
-kamoun_all <- kamoun_all %>% 
-  dplyr::select(lab, labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
-
-
-#Raw data
-wb_all = bind_rows(delponte_all, kamoun_all)
-
-
-sd <- SharedData$new(wb_all)
-sd2 <- SharedData$new(wb_all)
+source("readdata.R", local = knitr::knit_global())
 
 ```
 
 
-```{r echo=FALSE}
-bscols(
 
-filter_select("lab", "Work team", sd, ~ lab),
-filter_select("year", "Year", sd, ~ year),
+```{r echo=FALSE, layout="l-page"}
+bscols(
+filter_slider("year", "Year", sd, ~ year),
 filter_select("host", "Origin host", sd, ~ host_binomial),
 filter_select("py_species", "Pyricularia spp.", sd, ~ py_binomial),
 filter_select("py_lineage", "P. oryzae lineage", sd, ~ py_lineage)
-
 )
 ```
 
 
-```{r echo=FALSE, layout="l-screen-inset shaded", fig.height=5}
+```{r echo=FALSE,  layout="l-page", fig.height=5}
 library(crosstalk)
 
 
 library(RColorBrewer)
 library(htmltools)
 pal <- colorFactor("Set2", domain = c("Wheat", "Non-wheat"))
-
 leaflet(data = sd, width = "100%") %>%
- setView(-46.8, -20.40, zoom = 4) %>%
+ setView(-1, -1, zoom = 2) %>%
   addProviderTiles("Esri.WorldImagery", group = "Aerial") %>%
   addProviderTiles("OpenTopoMap", group = "Terrain") %>%
   addScaleBar("bottomright") %>%
@@ -118,7 +50,7 @@ leaflet(data = sd, width = "100%") %>%
 
     popup = paste(
       "<h3>Isolate details</h3>",
-      "Work team:", wb_all$"lab", "<br>",
+      "Laboratory:", wb_all$"lab", "<br>",
       "Code:", wb_all$"labcode", "<br>",
       "Host:", wb_all$"host_binomial", "</i>", "<br>",
        "City:", wb_all$"county_municipality", "<br>",

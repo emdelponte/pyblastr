@@ -7,50 +7,11 @@ output:
 
 ---
 
-
-
 ```{r setup, include=FALSE}
-
-library(gsheet)
-library(tidyverse)
-library(crosstalk)
-library(DT)
-library(ggthemes)
-library(janitor)
-library(cowplot)
-library(plotly)
-
-Sys.setlocale("LC_ALL", "pt_BR.UTF-8")
-
-
-#mg_prod <- gsheet2tbl("https://docs.google.com/spreadsheets/d/13xAflAQ-x78Vkq0O0jUEkUxHPq5G1R4gwqzillMxoTo/edit?usp=sharing")
-
-
-
-wb2<- gsheet2tbl("https://docs.google.com/spreadsheets/d/1R6UXFcsbVgpPYyvfkPvZ81rqkyk4U_9aS7qV8TKPsxQ/edit?usp=sharing")
-
-
-wb_all <- wb2 %>%
-  filter(labcode != 0) %>%
-    mutate(id = case_when(
-    is.na(py_binomial) ~ "No",
-    TRUE ~ "Yes"
-  )) %>%
-  mutate(wheat = case_when(
-    host_binomial == "Triticum aestivum" ~ "Wheat",
-    TRUE ~ "Non-wheat"
-  ))
-
-wb_all <- wb_all %>% 
-  dplyr::select(labcode, year, country, state_province, county_municipality, lat, lon, host_binomial, py_binomial,  py_lineage, wheat)
-
-set.seed(1000)
-wb_all$lat <- round(jitter(wb_all$lat, factor = 1, amount = 0.001), 4)
-wb_all$lon <- round(jitter(wb_all$lon, factor = 1, amount = 0.001), 4)
-sd <- SharedData$new(wb_all)
-sd2 <- SharedData$new(wb_all)
+source("readdata.R", local = knitr::knit_global())
 
 ```
+
 
 
 
@@ -60,10 +21,10 @@ sd2 <- SharedData$new(wb_all)
 
 
 p_host <- wb_all %>% 
-  tabyl(host_binomial) %>% 
+  tabyl(host_binomial) %>%
   ggplot(aes(reorder(host_binomial, n), n))+
   geom_col(fill = "#558796")+
-  theme_minimal_grid()+
+  theme_minimal_grid(font_size = 9)+
   coord_flip()+
   theme(legend.position = "none", 
         #plot.margin = margin(1, 2, 2, 2, "cm"), 
@@ -87,7 +48,7 @@ p_py <- wb_all %>%
   tabyl(py_binomial) %>% 
     ggplot(aes(reorder(py_binomial, n), n))+
 geom_col(fill = "#558796")+
-  theme_minimal_grid()+
+  theme_minimal_grid(font_size = 10)+
   coord_flip()+
   theme(legend.position = "none", plot.margin = margin(2, 2, 2, 2, "cm"), axis.text.y = element_text(face = "italic"))+
   labs(x = "", y = "Number of strains", title = "Pyricularia spp.")
@@ -110,7 +71,7 @@ p_lin <- wb_all %>%
   tabyl(py_lineage) %>% 
     ggplot(aes(reorder(py_lineage, n), n))+
   geom_col(fill = "#558796")+
-  theme_minimal_grid()+
+  theme_minimal_grid(font_size = 10)+
   coord_flip()+
   theme(legend.position = "none", plot.margin = margin(2, 2, 2, 2, "cm"))+
   labs(x = "", y = "Number of strains", title = "P. oryzae lineages")

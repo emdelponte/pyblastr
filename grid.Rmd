@@ -7,59 +7,23 @@ output:
 
 
 ```{r setup, include=FALSE}
-
-library(gsheet)
-library(tidyverse)
-library(crosstalk)
-library(DT)
-library(ggthemes)
-library(janitor)
-library(cowplot)
-library(plotly)
-
-Sys.setlocale("LC_ALL", "pt_BR.UTF-8")
-
-
-#mg_prod <- gsheet2tbl("https://docs.google.com/spreadsheets/d/13xAflAQ-x78Vkq0O0jUEkUxHPq5G1R4gwqzillMxoTo/edit?usp=sharing")
-
-
-
-wb2<- gsheet2tbl("https://docs.google.com/spreadsheets/d/1R6UXFcsbVgpPYyvfkPvZ81rqkyk4U_9aS7qV8TKPsxQ/edit?usp=sharing")
-
-
-wb_all <- wb2 %>%
-  filter(labcode != 0) %>%
-    mutate(id = case_when(
-    is.na(py_binomial) ~ "No",
-    TRUE ~ "Yes"
-  )) %>%
-  mutate(wheat = case_when(
-    host_binomial == "Triticum aestivum" ~ "Wheat",
-    TRUE ~ "Non-wheat"
-  ))
-
-wb_all <- wb_all %>% 
-  dplyr::select(labcode, year, country, state_province, collector, host_binomial, py_binomial, py_lineage)
-
-
-sd <- SharedData$new(wb_all)
-sd2 <- SharedData$new(wb_all)
+source("readdata.R", local = knitr::knit_global())
 
 ```
 
 
 ```{r echo=FALSE, layout="l-page"}
 library(crosstalk)
+
 bscols(
-
-
-filter_select("host", "Host binomial", sd, ~host_binomial),
-filter_select("py_species", "Pyricularia sp.", sd, ~py_binomial),
-filter_select("py_lineage", "P. oryzae lineage", sd, ~py_lineage)
-
+filter_slider("year", "Year", sd2, ~ year),
+filter_select("host", "Origin host", sd2, ~ host_binomial),
+filter_select("py_species", "Pyricularia spp.", sd2, ~ py_binomial),
+filter_select("py_lineage", "P. oryzae lineage", sd2, ~ py_lineage)
 )
 
- datatable(sd, rownames = FALSE,
+
+ datatable(sd2, rownames = FALSE,
            extensions = c("Buttons"),
              class = 'table-bordered table-condensed',
            options = list(
