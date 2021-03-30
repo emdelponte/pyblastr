@@ -8,9 +8,7 @@ output:
 ---
 
 
-
 ```{r setup, include=FALSE}
-
 library(gsheet)
 library(tidyverse)
 library(crosstalk)
@@ -27,19 +25,13 @@ library(viridis)
 library(leaflet.providers)
 library(leaflet)
 
-
-
 Sys.setlocale("LC_ALL", "pt_BR.UTF-8")
 
 
-mg_prod <- gsheet2tbl("https://docs.google.com/spreadsheets/d/13xAflAQ-x78Vkq0O0jUEkUxHPq5G1R4gwqzillMxoTo/edit?usp=sharing")
 
-
-
-wb2<- gsheet2tbl("https://docs.google.com/spreadsheets/d/1R6UXFcsbVgpPYyvfkPvZ81rqkyk4U_9aS7qV8TKPsxQ/edit?usp=sharing")
-
-
-wb_all <- wb2 %>%
+#DelPonte Lab
+delponte = gsheet2tbl("https://docs.google.com/spreadsheets/d/1R6UXFcsbVgpPYyvfkPvZ81rqkyk4U_9aS7qV8TKPsxQ/edit?usp=sharing")
+delponte_all <- delponte %>%
   filter(labcode != 0) %>%
     mutate(id = case_when(
     is.na(py_binomial) ~ "No",
@@ -48,10 +40,33 @@ wb_all <- wb2 %>%
   mutate(wheat = case_when(
     host_binomial == "Triticum aestivum" ~ "Wheat",
     TRUE ~ "Non-wheat"
-  ))
+  )) %>% 
+  mutate(lab = "DelPonte-Lab")
 
-wb_all <- wb_all %>% 
-  dplyr::select(labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
+delponte_all = delponte_all %>% 
+  dplyr::select(lab, labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
+
+
+#Kamoun lab
+kamoun = gsheet2tbl("https://docs.google.com/spreadsheets/d/13PyoQobtdE3xessW14rHud45MlXUOsMOgKDWG81kxCc/edit#gid=1082341206")
+kamoun_all = kamoun %>%
+  filter(labcode != 0) %>%
+    mutate(id = case_when(
+    is.na(py_binomial) ~ "No",
+    TRUE ~ "Yes"
+  )) %>%
+  mutate(wheat = case_when(
+    host_binomial == "Triticum aestivum" ~ "Wheat",
+    TRUE ~ "Non-wheat"
+  )) %>% 
+  mutate(lab = "Kamoun-Lab")
+
+kamoun_all <- kamoun_all %>% 
+  dplyr::select(lab, labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
+
+
+#Raw data
+wb_all = bind_rows(delponte_all, kamoun_all)
 
 
 sd <- SharedData$new(wb_all)
@@ -63,9 +78,10 @@ sd2 <- SharedData$new(wb_all)
 ```{r echo=FALSE}
 bscols(
 
-
+filter_select("lab", "Work team", sd, ~ lab),
+filter_select("year", "Year", sd, ~ year),
 filter_select("host", "Origin host", sd, ~ host_binomial),
-filter_select("py_species", "Pyricularia species", sd, ~ py_binomial),
+filter_select("py_species", "Pyricularia spp.", sd, ~ py_binomial),
 filter_select("py_lineage", "P. oryzae lineage", sd, ~ py_lineage)
 
 )
@@ -102,6 +118,7 @@ leaflet(data = sd, width = "100%") %>%
 
     popup = paste(
       "<h3>Isolate details</h3>",
+      "Work team:", wb_all$"lab", "<br>",
       "Code:", wb_all$"labcode", "<br>",
       "Host:", wb_all$"host_binomial", "</i>", "<br>",
        "City:", wb_all$"county_municipality", "<br>",
