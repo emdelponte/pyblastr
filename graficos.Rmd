@@ -18,22 +18,13 @@ source("readdata.R", local = knitr::knit_global())
 ### Strains by host
 
 
-```{r}
-p_host <- wb_all %>% 
+```{r echo=FALSE, fig.height=10, fig.width=6}
+host <- wb_all %>% 
   group_by(host_binomial) %>%
   summarise(n = length(labcode)) %>% 
-  
-  ggplot(aes(reorder(host_binomial, n), n))+
-  geom_col(fill = "#558796")+
-  geom_text(aes(reorder(host_binomial, n), n, label = n), size = 2, hjust = -0.1) +
-  theme_minimal_grid(font_size = 9)+
-  coord_flip()+
-  theme(legend.position = "none", 
-        #plot.margin = margin(1, 2, 2, 2, "cm"), 
-        axis.text.y = element_text(face = "italic"))+
-  labs(x = "", y = "Number of strains", title = "Host species")
-  
-p_host
+  arrange(-n)
+
+datatable(host)
   
 ```
 
@@ -42,22 +33,16 @@ p_host
 
 ### Strains by species
 
-```{r echo=FALSE, layout="l-body-outset"}
+```{r echo=FALSE}
 library(janitor)
 
 p_py <- wb_all %>% 
   filter(py_binomial != "NA") %>% 
   tabyl(py_binomial) %>% 
-    
-  ggplot(aes(reorder(py_binomial, n), n))+
-  geom_col(fill = "#558796")+
-  geom_text(aes(reorder(py_binomial, n), n, label = n), size = 2, hjust = -0.1) +
-  theme_minimal_grid(font_size = 10)+
-  coord_flip()+
-  theme(legend.position = "none", plot.margin = margin(2, 2, 2, 2, "cm"), axis.text.y = element_text(face = "italic"))+
-  labs(x = "", y = "Number of strains", title = "Pyricularia spp.")
+  arrange(-n) %>% 
+  select(-percent)
   
-p_py
+datatable(p_py)
   
   
 
@@ -67,22 +52,16 @@ p_py
 ### Strains by lineages
 
 
-```{r echo=FALSE, layout="l-body-outset"}
+```{r echo=FALSE}
 library(janitor)
 
 p_lin <- wb_all %>% 
   filter(py_lineage != "NA") %>% 
-  tabyl(py_lineage) %>% 
-    ggplot(aes(reorder(py_lineage, n), n))+
-  geom_col(fill = "#558796")+
-  geom_text(aes(reorder(py_lineage, n), n, label = n), size = 2, hjust = -0.1) +
-  theme_minimal_grid(font_size = 10)+
-  coord_flip()+
-  theme(legend.position = "none", plot.margin = margin(2, 2, 2, 2, "cm"))+
-  labs(x = "", y = "Number of strains", title = "P. oryzae lineages")
-  
-p_lin
-  
+  tabyl(py_lineage) %>%  
+arrange(-n) %>% 
+  select(-percent)
+
+datatable(p_lin)
   
 
 

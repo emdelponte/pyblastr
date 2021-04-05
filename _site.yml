@@ -12,7 +12,7 @@ navbar:
       href: grid.html
     - text: "Map view"
       href: map.html
-    - text: "Charts"
+    - text: "Summary tables & charts"
       href: graficos.html
      
 

@@ -12,6 +12,8 @@ source("readdata.R", local = knitr::knit_global())
 ```
 
 
+Total number of strains: **`r nrow(wb_all2)`**. 
+
 ```{r echo=FALSE, layout="l-page"}
 library(crosstalk)
 
