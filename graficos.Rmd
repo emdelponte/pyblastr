@@ -17,13 +17,15 @@ source("readdata.R", local = knitr::knit_global())
 
 ### Strains by host
 
-```{r echo=FALSE, layout="l-body-outset"}
 
-
+```{r}
 p_host <- wb_all %>% 
-  tabyl(host_binomial) %>%
+  group_by(host_binomial) %>%
+  summarise(n = length(labcode)) %>% 
+  
   ggplot(aes(reorder(host_binomial, n), n))+
   geom_col(fill = "#558796")+
+  geom_text(aes(reorder(host_binomial, n), n, label = n), size = 2, hjust = -0.1) +
   theme_minimal_grid(font_size = 9)+
   coord_flip()+
   theme(legend.position = "none", 
@@ -33,9 +35,9 @@ p_host <- wb_all %>%
   
 p_host
   
-  
-
 ```
+
+
 
 
 ### Strains by species
@@ -46,8 +48,10 @@ library(janitor)
 p_py <- wb_all %>% 
   filter(py_binomial != "NA") %>% 
   tabyl(py_binomial) %>% 
-    ggplot(aes(reorder(py_binomial, n), n))+
-geom_col(fill = "#558796")+
+    
+  ggplot(aes(reorder(py_binomial, n), n))+
+  geom_col(fill = "#558796")+
+  geom_text(aes(reorder(py_binomial, n), n, label = n), size = 2, hjust = -0.1) +
   theme_minimal_grid(font_size = 10)+
   coord_flip()+
   theme(legend.position = "none", plot.margin = margin(2, 2, 2, 2, "cm"), axis.text.y = element_text(face = "italic"))+
@@ -71,6 +75,7 @@ p_lin <- wb_all %>%
   tabyl(py_lineage) %>% 
     ggplot(aes(reorder(py_lineage, n), n))+
   geom_col(fill = "#558796")+
+  geom_text(aes(reorder(py_lineage, n), n, label = n), size = 2, hjust = -0.1) +
   theme_minimal_grid(font_size = 10)+
   coord_flip()+
   theme(legend.position = "none", plot.margin = margin(2, 2, 2, 2, "cm"))+

@@ -54,8 +54,48 @@ kamoun_all <- kamoun_all %>%
   dplyr::select(lab, labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
 
 
+#Farman lab
+farman = gsheet2tbl("https://docs.google.com/spreadsheets/d/1Ax1QWcVsNBxrRGXLxhwlvjwZtDjixdsuyVC51-0bgs0/edit?usp=sharing")
+farman_all = farman %>%
+  filter(labcode != 0) %>%
+  mutate(id = case_when(
+    is.na(py_binomial) ~ "No",
+    TRUE ~ "Yes"
+  )) %>%
+  mutate(wheat = case_when(
+    host_binomial == "Triticum aestivum" ~ "Wheat",
+    TRUE ~ "Non-wheat"
+  )) %>% 
+  mutate(lab = "Farman-Lab")
+
+farman_all <- farman_all %>% 
+  dplyr::select(lab, labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
+
+
+
+#BioTrigo 
+biotrigo = gsheet2tbl("https://docs.google.com/spreadsheets/d/18Ifv9rKzHM4do5foH3ZPsmXkZBGqnAORpFoXt0gdWjg/edit?usp=sharing")
+biotrigo_all = biotrigo %>%
+  filter(labcode != 0) %>%
+  mutate(id = case_when(
+    is.na(py_binomial) ~ "No",
+    TRUE ~ "Yes"
+  )) %>%
+  mutate(wheat = case_when(
+    host_binomial == "Triticum aestivum" ~ "Wheat",
+    TRUE ~ "Non-wheat"
+  )) %>% 
+  mutate(lab = "BioTrigo Genética")
+
+biotrigo_all <- biotrigo_all %>% 
+  dplyr::select(lab, labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
+
+
+
+
+
 #Raw data
-wb_all = bind_rows(delponte_all, kamoun_all)
+wb_all = bind_rows(delponte_all, kamoun_all, farman_all, biotrigo_all)
 
 sd <- SharedData$new(wb_all)
 
