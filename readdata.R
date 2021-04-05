@@ -85,7 +85,7 @@ biotrigo_all = biotrigo %>%
     host_binomial == "Triticum aestivum" ~ "Wheat",
     TRUE ~ "Non-wheat"
   )) %>% 
-  mutate(lab = "BioTrigo Genética")
+  mutate(lab = "BioTrigo Genetica")
 
 biotrigo_all <- biotrigo_all %>% 
   dplyr::select(lab, labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
