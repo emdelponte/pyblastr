@@ -58,7 +58,7 @@ leaflet(data = sd, width = "100%") %>%
       "Year:", wb_all$"year", "<br>",
       "Species:<i>", wb_all$"py_binomial", "<br></i>",
         "Lineage:<i>", wb_all$"py_lineage", "<br></i>",
-      "Collector:", wb_all$"collector", "<br>"
+      "Collector/Source:", wb_all$"collector", "<br>"
     )
   ) %>%
   addLegend("bottomleft",

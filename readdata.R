@@ -91,11 +91,30 @@ biotrigo_all <- biotrigo_all %>%
   dplyr::select(lab, labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
 
 
+#Croll lab 
+croll = gsheet2tbl("https://docs.google.com/spreadsheets/d/1uJGZSdtZJc0mHlFB7yoSeWTs2zMVzlSrOaCNCRp1Il0/edit?usp=sharing")
+croll_all = croll %>%
+  filter(labcode != 0) %>%
+  mutate(id = case_when(
+    is.na(py_binomial) ~ "No",
+    TRUE ~ "Yes"
+  )) %>%
+  mutate(wheat = case_when(
+    host_binomial == "Triticum aestivum" ~ "Wheat",
+    TRUE ~ "Non-wheat"
+  )) %>% 
+  mutate(lab = "Croll-Lab")
+
+croll_all <- croll_all %>% 
+  dplyr::select(lab, labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
+
+
+
 
 
 
 #Raw data
-wb_all = bind_rows(delponte_all, kamoun_all, farman_all, biotrigo_all)
+wb_all = bind_rows(delponte_all, kamoun_all, farman_all, biotrigo_all, croll_all)
 
 sd <- SharedData$new(wb_all)
 
