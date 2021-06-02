@@ -30,10 +30,10 @@ delponte_all <- delponte %>%
     host_binomial == "Triticum aestivum" ~ "Wheat",
     TRUE ~ "Non-wheat"
   )) %>% 
-  mutate(lab = "DelPonte-Lab")
+  mutate(Source = "Ascari et al. (unpublished)")
 
 delponte_all = delponte_all %>% 
-  dplyr::select(lab, labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
+  dplyr::select(Source, labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
 
 
 #Kamoun lab
@@ -48,10 +48,10 @@ kamoun_all = kamoun %>%
     host_binomial == "Triticum aestivum" ~ "Wheat",
     TRUE ~ "Non-wheat"
   )) %>% 
-  mutate(lab = "Kamoun-Lab")
+  mutate(Source = "Kamoun-Lab")
 
 kamoun_all <- kamoun_all %>% 
-  dplyr::select(lab, labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
+  dplyr::select(Source, labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
 
 
 #Farman lab
@@ -66,10 +66,10 @@ farman_all = farman %>%
     host_binomial == "Triticum aestivum" ~ "Wheat",
     TRUE ~ "Non-wheat"
   )) %>% 
-  mutate(lab = "Farman-Lab")
+  mutate(Source = "Farman-Lab")
 
 farman_all <- farman_all %>% 
-  dplyr::select(lab, labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
+  dplyr::select(Source, labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
 
 
 
@@ -85,10 +85,10 @@ biotrigo_all = biotrigo %>%
     host_binomial == "Triticum aestivum" ~ "Wheat",
     TRUE ~ "Non-wheat"
   )) %>% 
-  mutate(lab = "BioTrigo Genetica")
+  mutate(Source = "BioTrigo Genetica")
 
 biotrigo_all <- biotrigo_all %>% 
-  dplyr::select(lab, labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
+  dplyr::select(Source, labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
 
 
 #Croll lab 
@@ -103,10 +103,10 @@ croll_all = croll %>%
     host_binomial == "Triticum aestivum" ~ "Wheat",
     TRUE ~ "Non-wheat"
   )) %>% 
-  mutate(lab = "Croll-Lab")
+  mutate(Source = "https://doi.org/10.5281/zenodo.4655959")
 
 croll_all <- croll_all %>% 
-  dplyr::select(lab, labcode, year, lat, lon, country, state_province, county_municipality, collector, host_binomial, py_binomial, py_lineage, wheat)
+  dplyr::select(Source, labcode, year, lat, lon, country, state_province, county_municipality, host_binomial, py_binomial, py_lineage, wheat)
 
 
 
@@ -115,6 +115,11 @@ croll_all <- croll_all %>%
 
 #Raw data
 wb_all = bind_rows(delponte_all, kamoun_all, farman_all, biotrigo_all, croll_all)
+
+
+
+
+
 
 sd <- SharedData$new(wb_all)
 
