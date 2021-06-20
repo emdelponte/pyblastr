@@ -28,8 +28,8 @@ ascari_all <- ascari %>%
   )) %>%
   mutate(wheat = case_when(
     host_binomial == "Triticum aestivum" ~ "Wheat",
-    TRUE ~ "Non-wheat"
-  ))
+    TRUE ~ "Non-wheat")) %>% 
+  filter(host_binomial != "Oryza sativa")
 
 ascari_all = ascari_all %>% 
   dplyr::select(labcode, year, lat, lon, country, state_province, county_municipality, source, host_binomial, py_binomial, py_lineage, wheat)
@@ -47,7 +47,8 @@ biotrigo_all = biotrigo %>%
   mutate(wheat = case_when(
     host_binomial == "Triticum aestivum" ~ "Wheat",
     TRUE ~ "Non-wheat"
-  ))
+  ))%>% 
+  filter(host_binomial != "Oryza sativa")
 
 biotrigo_all <- biotrigo_all %>%
   dplyr::select(labcode, year, lat, lon, country, state_province, county_municipality, source, host_binomial, py_binomial, py_lineage, wheat)
@@ -65,7 +66,8 @@ tembo_all = tembo %>%
   mutate(wheat = case_when(
     host_binomial == "Triticum aestivum" ~ "Wheat",
     TRUE ~ "Non-wheat"
-  ))
+  ))%>% 
+  filter(host_binomial != "Oryza sativa")
 
 tembo_all <- tembo_all %>% 
   dplyr::select(labcode, year, lat, lon, country, state_province, county_municipality, source, host_binomial, py_binomial, py_lineage, wheat)
