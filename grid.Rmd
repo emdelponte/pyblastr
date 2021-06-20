@@ -30,7 +30,7 @@ filter_select("py_lineage", "P. oryzae lineage", sd2, ~ py_lineage)
              class = 'table-bordered table-condensed',
            options = list(
     dom = "Bfrtip", 
-    pageLength = 15,
+    pageLength = 10,
     buttons = c("excel")))
            
 

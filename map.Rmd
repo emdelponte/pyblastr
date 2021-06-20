@@ -51,14 +51,13 @@ leaflet(data = sd, width = "100%") %>%
 
     popup = paste(
       "<h3>Isolate details</h3>",
-      "Laboratory:", wb_all$"lab", "<br>",
+      "Source:", wb_all$"source", "<br>",
       "Code:", wb_all$"labcode", "<br>",
       "Host:", wb_all$"host_binomial", "</i>", "<br>",
-       "City:", wb_all$"county_municipality", "<br>",
+      "City:", wb_all$"county_municipality", "<br>",
       "Year:", wb_all$"year", "<br>",
-      "Species:<i>", wb_all$"py_binomial", "<br></i>",
-        "Lineage:<i>", wb_all$"py_lineage", "<br></i>",
-      "Collector/Source:", wb_all$"collector", "<br>"
+      "Species:<i>", wb_all$"py_binomial", "<br></i>"
+      #"Lineage:<i>", wb_all$"py_lineage", "<br></i>"
     )
   ) %>%
   addLegend("bottomleft",
