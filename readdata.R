@@ -135,7 +135,18 @@ tembo_all <- tembo_all %>%
 
 
 #Raw data
-wb_all = bind_rows(ascari_all, biotrigo_all, tembo_all)
+set.seed(1)
+wb_all = bind_rows(ascari_all, biotrigo_all, tembo_all) %>% 
+unite("latlong", lat, lon, sep ="/", remove = F ) %>% 
+  group_by(latlong) %>% 
+  mutate(n = n(),
+         lat = case_when(n > 1 ~ rnorm(n, lat,0.01),
+                              n == 1 ~ lat),
+         lon = case_when(n > 1 ~ rnorm(n, lon,0.01),
+                               n == 1 ~ lon)
+  ) %>%
+  ungroup() %>% 
+  dplyr::select(-latlong)
 
 
 
